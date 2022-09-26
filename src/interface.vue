@@ -1,21 +1,11 @@
 <template>
 	<div ref="editorElement" :class="{ [font]: true, disabled, bordered }"></div>
 
-	<DrawerCollection
+	<ImageSelectDrawer
 		v-if="haveFilesAccess && !disabled"
-		collection="directus_files"
 		:active="fileHandler !== null"
-		:multiple="false"
-		:filter="undefined"
-		@input="
-			async (data) => {
-				isImageSaving = true;
-				await setSelectedFile(data);
-				isImageSaving = false;
-				unsetFileHandler();
-			}
-		"
-		@update:active="(active) => (!active && !isImageSaving ? unsetFileHandler() : null)"
+		@update="handleFile"
+		@cancel="unsetFileHandler"
 	/>
 </template>
 
@@ -31,7 +21,7 @@ import useFileHandler from './use-filehandler';
 import getTools from './get-tools';
 import getTranslations from './translations';
 import { wait } from './wait';
-import DrawerCollection from './components/drawer-collection.vue';
+import ImageSelectDrawer from './ImageSelectDrawer.vue';
 
 const props = withDefaults(
 	defineProps<{
@@ -99,15 +89,6 @@ const tools = getTools(
 	props.tools,
 	haveFilesAccess
 );
-
-// Logic from v-upload (see: https://github.com/directus/directus/blob/main/app/src/components/v-upload.vue#L237)
-const setSelectedFile = async (selection: string[]) => {
-	if (selection[0]) {
-		const id = selection[0];
-		const fileResponse = await api.get(`/files/${id}`);
-		handleFile(fileResponse.data.data);
-	}
-};
 
 onMounted(() => {
 	const initialValue = getSanitizedValue(props.value);
