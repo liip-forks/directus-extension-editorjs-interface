@@ -107,6 +107,7 @@ const props = withDefaults(
 			'image',
 			'embed',
 			'inlinesmall',
+			'delimiter',
 			'inverteddelimiter',
 			'button',
 			'iframe',
