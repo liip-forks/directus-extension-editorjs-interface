@@ -11,6 +11,7 @@ import UnderlineTool from '@editorjs/underline';
 import EmbedTool from '@editorjs/embed';
 import MarkerTool from '@editorjs/marker';
 import RawToolTool from '@editorjs/raw';
+import RawScriptsTool from './custom-plugins/raw-script.js';
 import InlineCodeTool from '@editorjs/inline-code';
 import AlertTool from 'editorjs-alert';
 import StrikethroughTool from '@itech-indrustries/editorjs-strikethrough';
@@ -118,8 +119,11 @@ export default function getTools(
 		delimiter: {
 			class: DelimiterTool,
 		},
-		raw: {
+		rawHTML: {
 			class: RawToolTool,
+		},
+		rawScript: {
+			class: RawScriptsTool,
 		},
 		checklist: {
 			class: ChecklistTool,

@@ -111,7 +111,8 @@ const props = withDefaults(
 			'inverteddelimiter',
 			'button',
 			'iframe',
-			'raw',
+			'rawHTML',
+			'rawScript',
 		],
 		font: 'sans-serif',
 	}

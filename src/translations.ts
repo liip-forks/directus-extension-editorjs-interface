@@ -28,7 +28,8 @@ export default function getTranslations(t: (str: string) => string): I18nConfig 
 				Image: t('interfaces.file-image.image'),
 				Attaches: t('file'),
 				Delimiter: t('wysiwyg_options.hr'),
-				'Raw HTML': t('raw_value'),
+				'Raw HTML': 'Rohwert (HTML)',
+				'Raw Script': 'Rohwert (Script)',
 				Table: t('wysiwyg_options.table'),
 				Link: t('wysiwyg_options.link'),
 				Bold: t('wysiwyg_options.bold'),
@@ -70,7 +71,7 @@ export default function getTranslations(t: (str: string) => string): I18nConfig 
 				embed: {
 					'Enter a caption': t('field_options.directus_roles.fields.name_placeholder'),
 				},
-				raw: {
+				rawHTML: {
 					'Enter a code': t('enter_raw_value'),
 				},
 				inverteddelimiter: {

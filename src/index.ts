@@ -54,7 +54,7 @@ export default defineInterface({
 			name: '$t:interfaces.input-rich-text-html.toolbar',
 			type: 'json',
 			schema: {
-				default_value: ['header', 'paragraph', 'nestedlist', 'quote', 'image', 'embed', 'inlinesmall', 'inverteddelimiter', 'button', 'iframe', 'raw', 'delimiter'],
+				default_value: ['header', 'paragraph', 'nestedlist', 'quote', 'image', 'embed', 'inlinesmall', 'inverteddelimiter', 'button', 'iframe', 'rawHTML', 'rawScript', 'delimiter'],
 			},
 			meta: {
 				width: 'half',
@@ -150,8 +150,12 @@ export default defineInterface({
 							text: 'Personality',
 						},
 						{
-							value: 'raw',
+							value: 'rawHTML',
 							text: 'Raw HTML',
+						},
+						{
+							value: 'rawScript',
+							text: 'Raw Script',
 						},
 						{
 							value: 'inverteddelimiter',
