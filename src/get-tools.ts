@@ -124,6 +124,9 @@ export default function getTools(
 		},
 		rawScript: {
 			class: RawScriptsTool,
+			config: {
+				placeholder: 'Hier bitte nur Script-Tags eingeben!',
+			},
 		},
 		checklist: {
 			class: ChecklistTool,
