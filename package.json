@@ -74,8 +74,5 @@
     "parserOptions": {
       "sourceType": "module"
     }
-  },
-  "dependencies": {
-    "@editorjs/nested-list": "github:liip-forks/editor-js-nested-list"
   }
 }
