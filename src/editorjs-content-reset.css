@@ -91,7 +91,7 @@
 
 .codex-editor .ce-block b,
 .codex-editor .ce-block strong {
-	color: var(--foreground-normal-alt);
+	color: var(--theme--foreground-subdued);
 	font-weight: 600;
 }
 
@@ -155,6 +155,6 @@
 .codex-editor .ce-block figure figcaption {
 	display: block;
 	margin-top: 0.25rem;
-	color: var(--foreground-subdued);
+	color: var(--theme--foreground-subdued);
 	text-align: center;
 }
