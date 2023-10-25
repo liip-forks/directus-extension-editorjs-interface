@@ -2,7 +2,7 @@
 
 .codex-editor .cdx-attaches,
 .codex-editor .cdx-personality {
-	color: var(--foreground-normal);
+	color: var(--theme--foreground-normal);
 	background: var(--background-normal);
 	border-color: var(--border-normal);
 	box-shadow: unset;
@@ -15,7 +15,7 @@
 	line-height: inherit;
 }
 .codex-editor .ce-paragraph[data-placeholder]:empty::before {
-	color: var(--foreground-subdued);
+	color: var(--theme--foreground-subdued);
 }
 
 /* Quote block */
@@ -88,11 +88,11 @@
 }
 
 .codex-editor .cdx-attaches--with-file .cdx-attaches__title {
-	color: var(--foreground-normal);
+	color: var(--theme--foreground-normal);
 }
 
 .codex-editor .cdx-attaches__size {
-	color: var(--foreground-subdued);
+	color: var(--theme--foreground-subdued);
 }
 
 .cdx-attaches--with-file .cdx-attaches__download-button svg {
@@ -149,8 +149,8 @@
 }
 
 .tc-toolbox {
-	--toggler-dots-color: var(--foreground-normal);
-	--toggler-dots-color-hovered: var(--foreground-normal-alt);
+	--toggler-dots-color: var(--theme--foreground-normal);
+	--toggler-dots-color-hovered: var(--theme--foreground-subdued);
 }
 
 .tc-toolbox__toggler:hover {
