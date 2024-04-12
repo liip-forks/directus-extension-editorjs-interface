@@ -6,7 +6,7 @@
  *  2. Upload by pasting URL
  *  3. Upload by pasting file from Clipboard or by Drag'n'Drop
  */
-import { EditorJsImage } from '../useImage';
+import { EditorJsImage } from '../use-image';
 
 export default class Uploader {
 	/**

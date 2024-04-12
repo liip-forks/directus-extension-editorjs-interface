@@ -1,7 +1,6 @@
 import SimpleImageTool from '@editorjs/simple-image';
 import ParagraphTool from '@editorjs/paragraph';
 import QuoteTool from '@editorjs/quote';
-import WarningTool from '@editorjs/warning';
 import ChecklistTool from '@editorjs/checklist';
 import DelimiterTool from '@editorjs/delimiter';
 import TableTool from '@editorjs/table';
@@ -9,24 +8,21 @@ import CodeTool from '@editorjs/code';
 import HeaderTool from '@editorjs/header';
 import UnderlineTool from '@editorjs/underline';
 import EmbedTool from '@editorjs/embed';
-import MarkerTool from '@editorjs/marker';
 import RawToolTool from '@editorjs/raw';
 import InlineCodeTool from '@editorjs/inline-code';
-import AlertTool from 'editorjs-alert';
 import StrikethroughTool from '@itech-indrustries/editorjs-strikethrough';
 import AlignmentTuneTool from 'editorjs-text-alignment-blocktune';
 import NestedListTool from '../../editor-js-nested-list/dist/nested-list';
-import ListTool from 'editorjs-list';
-import ImageTool from './custom-plugins/plugin-image-patch.js';
-import AttachesTool from './custom-plugins/plugin-attaches-patch.js';
-import PersonalityTool from './custom-plugins/plugin-personality-patch.js';
+import { ImageTool } from './custom-plugins/plugin-image-patch';
+import { AttachesTool } from './custom-plugins/plugin-attaches-patch';
 import InvertedDelimiterTool from '../../editorjs-inverted-delimiter/dist/bundle';
 import InlineSmallTool from '../../editorjs-inline-small/dist/bundle';
 import ButtonTool from '../../editorjs-button/dist/bundle';
 import IframeTool from '../../editorjs-iframe/dist/bundle';
-import { EditorJsImage } from './useImage';
+import { EditorJsImage } from './use-image';
 
 export type UploaderConfig = {
+	baseURL: string | undefined;
 	setFileHandler: (handler: any) => void;
 	t: Record<string, string>;
 	openImageDrawer: () => void;
@@ -38,15 +34,14 @@ export type UploaderConfig = {
 export default function getTools(
 	uploaderConfig: UploaderConfig,
 	selection: Array<string>,
-	haveFilesAccess: boolean
+	haveFilesAccess: boolean,
 ): Record<string, object> {
 	const tools: Record<string, any> = {};
-	const fileRequiresTools = ['attaches', 'personality', 'image'];
+	const fileRequiresTools = ['attaches', 'image'];
 
 	const defaults: Record<string, any> = {
 		header: {
 			class: HeaderTool,
-			shortcut: 'CMD+SHIFT+H',
 			inlineToolbar: true,
 			config: {
 				levels: [2, 3, 4],
@@ -54,14 +49,12 @@ export default function getTools(
 			},
 		},
 		list: {
-			class: ListTool,
+			class: NestedListTool,
 			inlineToolbar: false,
-			shortcut: 'CMD+SHIFT+1',
 		},
 		nestedlist: {
 			class: NestedListTool,
 			inlineToolbar: true,
-			shortcut: 'CMD+SHIFT+L',
 		},
 		embed: {
 			class: EmbedTool,
@@ -80,20 +73,11 @@ export default function getTools(
 		code: {
 			class: CodeTool,
 		},
-		warning: {
-			class: WarningTool,
-			inlineToolbar: true,
-			shortcut: 'CMD+SHIFT+W',
-		},
 		underline: {
 			class: UnderlineTool,
-			shortcut: 'CMD+SHIFT+U',
 		},
 		strikethrough: {
 			class: StrikethroughTool,
-		},
-		alert: {
-			class: AlertTool,
 		},
 		table: {
 			class: TableTool,
@@ -102,15 +86,9 @@ export default function getTools(
 		quote: {
 			class: QuoteTool,
 			inlineToolbar: true,
-			shortcut: 'CMD+SHIFT+O',
-		},
-		marker: {
-			class: MarkerTool,
-			shortcut: 'CMD+SHIFT+M',
 		},
 		inlinecode: {
 			class: InlineCodeTool,
-			shortcut: 'CMD+SHIFT+I',
 		},
 		inlinesmall: {
 			class: InlineSmallTool,
@@ -140,12 +118,6 @@ export default function getTools(
 				uploader: uploaderConfig,
 			},
 		},
-		personality: {
-			class: PersonalityTool,
-			config: {
-				uploader: uploaderConfig,
-			},
-		},
 		alignmentTune: {
 			class: AlignmentTuneTool,
 		},
@@ -168,17 +140,19 @@ export default function getTools(
 		}
 	}
 
+	// Add alignment to all tools that support it if it's enabled.
+	// editor.js tools means we need to already declare alignment in the tools object before we can assign it to other tools.
 	if ('alignmentTune' in tools) {
 		if ('paragraph' in tools) {
-			tools.paragraph.tunes = ['alignmentTune'];
+			tools['paragraph'].tunes = ['alignmentTune'];
 		}
 
 		if ('header' in tools) {
-			tools.header.tunes = ['alignmentTune'];
+			tools['header'].tunes = ['alignmentTune'];
 		}
 
 		if ('quote' in tools) {
-			tools.quote.tunes = ['alignmentTune'];
+			tools['quote'].tunes = ['alignmentTune'];
 		}
 	}
 

@@ -10,7 +10,6 @@ type UsableImage = {
 	openImageDrawer: () => void;
 	onImageSelect: (image: DirectusFile) => void;
 	onImageEdit: (image: EditorJsImage) => void;
-	fileHandler: Ref<UploaderHandler | null>;
 	setFileHandler: (handler: UploaderHandler) => void;
 	handleFile: (selectedImage: EditorJsImage) => void;
 	getImagePreviewUrl: (imageUrl: string) => string;
@@ -62,7 +61,6 @@ export default function useImage(
 		openImageDrawer,
 		onImageSelect,
 		onImageEdit,
-		fileHandler,
 		setFileHandler,
 		handleFile,
 		getImagePreviewUrl,

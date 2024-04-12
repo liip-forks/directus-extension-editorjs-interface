@@ -1,5 +1,5 @@
-import ImageTool from '@editorjs/image';
-import Uploader from './editorjs-uploader.js';
+import BaseImageTool from '@editorjs/image';
+import Uploader from './editorjs-uploader';
 
 const tunes = [
 	{
@@ -13,8 +13,8 @@ const tunes = [
  * Patch allows custom uploader.
  * https://github.com/editor-js/image/blob/master/src/index.js
  */
-export default class extends ImageTool {
-	constructor(params) {
+export class ImageTool extends BaseImageTool {
+	constructor(params: any) {
 		super(params);
 
 		// hide unused caption element
@@ -22,8 +22,8 @@ export default class extends ImageTool {
 
 		this.uploader = new Uploader({
 			config: this.config,
-			onUpload: (response) => this.onUpload(response),
-			onError: (error) => this.uploadingFailed(error),
+			onUpload: (response: any) => this.onUpload(response),
+			onError: (error: any) => this.uploadingFailed(error),
 			dispatchChange: params.block.dispatchChange,
 		});
 	}
@@ -46,8 +46,9 @@ export default class extends ImageTool {
 		return this._data;
 	}
 
-	set image(file) {
+	set image(file: { url?: any }) {
 		this._data.file = file || {};
+
 		if (file && file.url) {
 			// Remove image element if already added to editor (happens when image gets edited)
 			if (this.ui.nodes.imageEl) {
