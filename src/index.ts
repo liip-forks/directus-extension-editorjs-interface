@@ -1,4 +1,4 @@
-import { defineInterface } from '@directus/extensions-sdk';
+import { defineInterface } from '@directus/extensions';
 import InterfaceComponent from './interface.vue';
 
 export default defineInterface({
@@ -66,10 +66,6 @@ export default defineInterface({
 							text: 'Header',
 						},
 						{
-							value: 'list',
-							text: 'List (legacy)',
-						},
-						{
 							value: 'nestedlist',
 							text: 'Nested List',
 						},
@@ -90,10 +86,6 @@ export default defineInterface({
 							text: 'Image',
 						},
 						{
-							value: 'warning',
-							text: 'Warning',
-						},
-						{
 							value: 'attaches',
 							text: 'Attaches',
 						},
@@ -104,10 +96,6 @@ export default defineInterface({
 						{
 							value: 'quote',
 							text: 'Quote',
-						},
-						{
-							value: 'marker',
-							text: 'Marker',
 						},
 						{
 							value: 'simpleimage',
@@ -126,10 +114,6 @@ export default defineInterface({
 							text: 'Inline Small',
 						},
 						{
-							value: 'alert',
-							text: 'Alert',
-						},
-						{
 							value: 'strikethrough',
 							text: 'Strikethrough',
 						},
@@ -144,10 +128,6 @@ export default defineInterface({
 						{
 							value: 'checklist',
 							text: 'Checklist',
-						},
-						{
-							value: 'personality',
-							text: 'Personality',
 						},
 						{
 							value: 'raw',
@@ -192,9 +172,6 @@ export default defineInterface({
 				width: 'full',
 				interface: 'system-folder',
 				note: '$t:interfaces.system-folder.field_hint',
-			},
-			schema: {
-				default_value: undefined,
 			},
 		},
 	],

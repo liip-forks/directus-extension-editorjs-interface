@@ -72,32 +72,27 @@
 import { ref, onMounted, onUnmounted, watch, withDefaults } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useApi, useStores } from '@directus/extensions-sdk';
-import EditorJS, { API, OutputData } from '@editorjs/editorjs';
+import EditorJS, { OutputData } from '@editorjs/editorjs';
 import isEqual from 'lodash/isEqual';
 import cloneDeep from 'lodash/cloneDeep';
 import useDirectusToken from './use-directus-token';
-import useImage from './useImage';
-import getTools from './get-tools';
+import useImage from './use-image';
+import getTools from './tools';
 import getTranslations from './translations';
-import { wait } from './wait';
 
 const props = withDefaults(
 	defineProps<{
 		disabled?: boolean;
-		nullable?: boolean;
 		autofocus?: boolean;
-		value?: object;
+		value?: Record<string, any> | null;
 		bordered?: boolean;
 		placeholder?: string;
-		tools: string[];
+		tools?: string[];
 		folder?: string;
-		font: 'sans-serif' | 'monospace' | 'serif';
+		font?: 'sans-serif' | 'monospace' | 'serif';
 	}>(),
 	{
-		disabled: false,
-		nullable: false,
-		autofocus: false,
-		value: () => null,
+		value: null,
 		bordered: true,
 		tools: () => [
 			'header',
@@ -117,13 +112,15 @@ const props = withDefaults(
 	}
 );
 
-const emit = defineEmits(['input']);
+const emit = defineEmits<{ input: [value: EditorJS.OutputData | null] }>();
 
 const { t } = useI18n();
-const api = useApi();
-const { addTokenToURL } = useDirectusToken(api);
+
 const { useCollectionsStore } = useStores();
 const collectionStore = useCollectionsStore();
+
+const api = useApi();
+const { addTokenToURL } = useDirectusToken(api);
 const {
 	imageDrawerOpen,
 	selectedImage,
@@ -131,19 +128,21 @@ const {
 	openImageDrawer,
 	onImageSelect,
 	onImageEdit,
-	fileHandler,
 	setFileHandler,
 	handleFile,
 	getImagePreviewUrl,
 	getRokkaHash,
 } = useImage(api, addTokenToURL);
-const editorjsInstance = ref<EditorJS>();
+
+const editorjsRef = ref<EditorJS>();
+const editorjsIsReady = ref(false);
 const editorElement = ref<HTMLElement>();
 const haveFilesAccess = Boolean(collectionStore.getCollection('directus_files'));
-const isInternalChange = ref<boolean>(false);
+const haveValuesChanged = ref(false);
 
 const tools = getTools(
 	{
+		baseURL: api.defaults.baseURL,
 		setFileHandler,
 		t: {
 			no_file_selected: t('no_file_selected'),
@@ -157,96 +156,100 @@ const tools = getTools(
 	haveFilesAccess
 );
 
-onMounted(() => {
-	const initialValue = getSanitizedValue(props.value);
-
-	editorjsInstance.value = new EditorJS({
+onMounted(async () => {
+	editorjsRef.value = new EditorJS({
 		i18n: getTranslations(t),
 		logLevel: 'ERROR' as EditorJS.LogLevels,
 		holder: editorElement.value,
-		data: initialValue || undefined,
-		// Readonly makes troubles in some cases, also requires all plugins to implement it.
-		// https://github.com/codex-team/editor.js/issues/1669
 		readOnly: false,
 		placeholder: props.placeholder,
 		minHeight: 72,
-		onChange: (context: API, event: CustomEvent) => emitValue(context, event),
+		onChange: (api) => emitValue(api),
 		tools: tools,
 	});
 
+
+	await editorjsRef.value.isReady;
+	editorjsIsReady.value = true;
+
+	const sanitizedValue = sanitizeValue(props.value);
+
+	if (sanitizedValue) {
+		await editorjsRef.value.render(sanitizedValue);
+	}
+
 	if (props.autofocus) {
-		editorjsInstance.value.focus();
+		editorjsRef.value.focus();
 	}
 });
 
 onUnmounted(() => {
-	if (!editorjsInstance.value) return;
-
-	editorjsInstance.value.destroy();
+	editorjsRef.value?.destroy();
 });
 
 watch(
 	() => props.value,
 	async (newVal: any, oldVal: any) => {
-		if (!editorjsInstance.value || !editorjsInstance.value.isReady || isInternalChange.value) return;
+		// First value will be set in 'onMounted'
+		if (!editorjsRef.value || !editorjsIsReady.value) return;
 
-		// Do not render if there is uploader active operation.
-		if (fileHandler.value !== null) return;
+		if (haveValuesChanged.value) {
+			haveValuesChanged.value = false;
+			return;
+		}
 
 		if (isEqual(newVal?.blocks, oldVal?.blocks)) return;
 
 		try {
-			await editorjsInstance.value.isReady;
-			const value = getSanitizedValue(newVal);
-			if (value) {
-				await editorjsInstance.value.render(value);
+			const sanitizedValue = sanitizeValue(newVal);
+
+			if (sanitizedValue) {
+				await editorjsRef.value.render(sanitizedValue);
 			} else {
-				editorjsInstance.value.clear();
+				editorjsRef.value.clear();
 			}
 		} catch (error) {
 			window.console.warn('editorjs-extension: %s', error);
 		}
-
-		isInternalChange.value = false;
-	}
+	},
 );
 
-function matchDisplayHeight(width) {
+function matchDisplayHeight(width: number) {
 	if (!selectedImage.value || !selectedImage.value.width || !selectedImage.value.height) {
 		return;
 	}
 	selectedImage.value.displayHeight = Math.round((selectedImage.value.height / selectedImage.value.width) * width);
 }
 
-function matchDisplayWidth(height) {
+function matchDisplayWidth(height: number) {
 	if (!selectedImage.value || !selectedImage.value.width || !selectedImage.value.height) {
 		return;
 	}
 	selectedImage.value.displayWidth = Math.round((selectedImage.value.width / selectedImage.value.height) * height);
 }
 
-async function emitValue(context: API, event: CustomEvent) {
+async function emitValue(context: EditorJS.API) {
 	if (props.disabled || !context || !context.saver) return;
-	isInternalChange.value = true;
 
 	try {
-		// Fixes deleting multiple blocks bug https://github.com/codex-team/editor.js/issues/1755#issuecomment-929550729
-		await wait(200);
-		const result: OutputData = await context.saver.save();
+		const result = await context.saver.save();
+
+		haveValuesChanged.value = true;
 
 		if (!result || result.blocks.length < 1) {
-			emit('input', props.nullable ? null : '{}');
+			emit('input', null);
 			return;
 		}
 
 		if (isEqual(result.blocks, props.value?.blocks)) return;
+
 		emit('input', result);
 	} catch (error) {
 		window.console.warn('editorjs-extension: %s', error);
 	}
 }
 
-function getSanitizedValue(value: any): OutputData | null {
+function sanitizeValue(value: any): OutputData | null {
 	if (!value || typeof value !== 'object' || !value.blocks || value.blocks.length < 1) return null;
 
 	return cloneDeep({
@@ -264,38 +267,49 @@ function getSanitizedValue(value: any): OutputData | null {
 	@include form-grid;
 }
 
+.btn--default {
+	color: #fff !important;
+	background-color: #0d6efd;
+	border-color: #0d6efd;
+}
+.btn--gray {
+	color: #fff !important;
+	background-color: #7c7c7c;
+	border-color: #7c7c7c;
+}
+
 .disabled {
-	color: var(--foreground-subdued);
-	background-color: var(--background-subdued);
-	border-color: var(--border-normal);
+	color: var(--theme--form--field--input--foreground-subdued);
+	background-color: var(--theme--form--field--input--background-subdued);
+	border-color: var(--theme--form--field--input--border-color);
 	pointer-events: none;
 }
 
 .bordered {
-	padding: var(--input-padding) 4px var(--input-padding) calc(var(--input-padding) + 8px) !important;
-	background-color: var(--background-page);
-	border: var(--border-width) solid var(--border-normal);
-	border-radius: var(--border-radius);
-}
+	padding: var(--theme--form--field--input--padding) max(32px, calc(var(--theme--form--field--input--padding) + 16px));
+	background-color: var(--theme--background);
+	border: var(--theme--border-width) solid var(--theme--form--field--input--border-color);
+	border-radius: var(--theme--border-radius);
 
-.bordered:hover {
-	border-color: var(--border-normal-alt);
-}
+	&:hover {
+		border-color: var(--theme--form--field--input--border-color-hover);
+	}
 
-.bordered:focus-within {
-	border-color: var(--primary);
+	&:focus-within {
+		border-color: var(--theme--form--field--input--border-color-focus);
+	}
 }
 
 .monospace {
-	font-family: var(--family-monospace);
+	font-family: var(--theme--fonts--monospace--font-family);
 }
 
 .serif {
-	font-family: var(--family-serif);
+	font-family: var(--theme--fonts--serif--font-family);
 }
 
 .sans-serif {
-	font-family: var(--family-sans-serif);
+	font-family: var(--theme--fonts--sans--font-family);
 }
 
 .uploader-drawer-content {
@@ -304,10 +318,10 @@ function getSanitizedValue(value: any): OutputData | null {
 	padding-bottom: var(--content-padding);
 }
 
-// Source: https://github.com/directus/directus/blob/main/app/src/views/private/components/file-preview.vue
+/* Source: https://github.com/directus/directus/blob/main/app/src/views/private/components/file-preview.vue */
 .file-preview {
 	position: relative;
-	max-width: calc((var(--form-column-max-width) * 2) + var(--form-horizontal-gap));
+	max-width: calc((var(--form-column-max-width) * 2) + var(--theme--form--column-gap));
 
 	img {
 		display: block;
@@ -318,17 +332,22 @@ function getSanitizedValue(value: any): OutputData | null {
 		max-width: 100%;
 		max-height: 400px;
 		object-fit: contain;
-		border-radius: var(--border-radius);
-		background-color: var(--background-normal);
+		border-radius: var(--theme--border-radius);
+		background-color: var(--theme--background-normal);
 	}
 
 	.image {
-		background-color: var(--background-normal);
-		border-radius: var(--border-radius);
+		border-radius: var(--theme--border-radius);
+		background-color: var(--theme--background-normal);
+	}
+
+
+	.image {
+		img {
+			z-index: 1;
+			display: block;
+			margin: 0 auto;
+		}
 	}
 }
 </style>
-
-<style src="./editorjs-ui.css"></style>
-<style src="./editorjs-components.css"></style>
-<style src="./editorjs-content-reset.css"></style>
