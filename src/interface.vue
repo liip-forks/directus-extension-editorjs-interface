@@ -104,6 +104,7 @@ const props = withDefaults(
 			'inlinesmall',
 			'delimiter',
 			'inverteddelimiter',
+			'accordion',
 			'button',
 			'iframe',
 			'raw',
