@@ -77,6 +77,9 @@ export default function getTranslations(t: (str: string) => string): I18nConfig 
 				inverteddelimiter: {
 					'Inverted Delimiter': 'Invertierter Bereich',
 				},
+				accordiondelimiter: {
+					'Accordion Delimiter': 'Akkordeon',
+				},
 				button: {
 					'Url placeholder': 'Bitte eine URL eingeben',
 					'Url label': 'URL Link',
