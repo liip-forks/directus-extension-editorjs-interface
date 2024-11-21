@@ -16,7 +16,7 @@ import NestedListTool from '../../editor-js-nested-list/dist/nested-list';
 import { ImageTool } from './custom-plugins/plugin-image-patch';
 import { AttachesTool } from './custom-plugins/plugin-attaches-patch';
 import InvertedDelimiterTool from '../../editorjs-inverted-delimiter/dist/bundle';
-import AccordionTool from '../../editorjs-accordion/dist/bundle';
+import AccordionDelimiterTool from '../../editorjs-accordion/dist/bundle';
 import InlineSmallTool from '../../editorjs-inline-small/dist/bundle';
 import ButtonTool from '../../editorjs-button/dist/bundle';
 import IframeTool from '../../editorjs-iframe/dist/bundle';
@@ -125,8 +125,8 @@ export default function getTools(
 		inverteddelimiter: {
 			class: InvertedDelimiterTool,
 		},
-		accordion: {
-			class: AccordionTool,
+		accordiondelimiter: {
+			class: AccordionDelimiterTool,
 		},
 		button: {
 			class: ButtonTool,

@@ -54,7 +54,7 @@ export default defineInterface({
 			name: '$t:interfaces.input-rich-text-html.toolbar',
 			type: 'json',
 			schema: {
-				default_value: ['header', 'paragraph', 'nestedlist', 'quote', 'image', 'embed', 'inlinesmall', 'inverteddelimiter', 'accordion', 'button', 'iframe', 'raw', 'delimiter'],
+				default_value: ['header', 'paragraph', 'nestedlist', 'quote', 'image', 'embed', 'inlinesmall', 'inverteddelimiter', 'accordiondelimiter', 'button', 'iframe', 'raw', 'delimiter'],
 			},
 			meta: {
 				width: 'half',
@@ -138,8 +138,8 @@ export default defineInterface({
 							text: 'Inverted Delimiter',
 						},
 						{
-							value: 'accordion',
-							text: 'Accordion',
+							value: 'accordiondelimiter',
+							text: 'Accordion Delimiter',
 						},
 						{
 							value: 'button',

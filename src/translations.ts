@@ -38,7 +38,7 @@ export default function getTranslations(t: (str: string) => string): I18nConfig 
 				Inlinesmall: 'Small',
 				Strikethrough: t('wysiwyg_options.strikethrough'),
 				'Inverted Delimiter': 'Invertierter Bereich',
-				'Accordion': 'Akkordeon',
+				'Accordion Delimiter': 'Akkordeon',
 			},
 			tools: {
 				header: {
