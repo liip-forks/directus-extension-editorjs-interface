@@ -89,7 +89,8 @@ export default function getTranslations(t: (str: string) => string): I18nConfig 
 					'EditorJs Button title': 'Button',
 					'Button type select label': 'Button Typ',
 					'Button type primary label': 'Primary',
-					'Button type secondary label': 'Secondary'
+					'Button type secondary label': 'Secondary',
+					'Button type tertiary label': 'Tertiary'
 				},
 				iframe: {
 					'Url placeholder': 'Bitte eine URL eingeben',
